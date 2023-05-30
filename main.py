@@ -21,10 +21,19 @@ def addVote(userid, employee, month, year):
     if os.path.isfile(file_path) == True:
     	file = open(filepath)
     	file_data = json.load(file)
+        for employeevalues in file_data:
+        	if userid in file_data[employeevalues]:
+                file_data[employeevalues].pop(userid)
+        file_data[employee].append(userid)
+        with open(file_path, "w") as file:
+        	file.write(json_object)
+        return True
+    else:
+        return False
         
 def createVote(employee1, employee2, employee3, month, year):
     file_path = f'resources/Votes/{month}.{year}.json'
-    json_object = {"employees": [employee1, employee2, employee3], employee1: [], employee2: [], employee3: []}}
+    json_object = {employee1: [], employee2: [], employee3: []}
     with open(file_path, "w+") as file:
 		file.write(json_object)
 
