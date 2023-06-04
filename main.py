@@ -1,6 +1,4 @@
 import discord
-import asyncio
-from discord.ext import commands
 
 from datetime import datetime
 import json
@@ -11,7 +9,7 @@ from json_functions import parent_dir
 
 bot = discord.Bot(case_insensitive=True)
 
-default_color = discord.Color(0xfa8072)
+default_color = discord.Color(0x0045BE)
 admins = [206636330095083523]
 
 months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
@@ -30,7 +28,7 @@ async def createavote(ctx, employee1: str, employee2: str, employee3: str, chann
 	else:
 		if (int(datetime.now().year)+1) <= year <= (int(datetime.now().year)-1):
 			return
-	createVote(employee1, employee2, employee3, month, year)
+	createVote(ctx.guild.id, employee1, employee2, employee3, month, year)
 	embed = discord.Embed(title=f'{year} MVP Vote for {month}!', description=f'Please react with who you think earned the top MVP spot! \n\n	{emojis[0]} - __{employee1}__ \n\n   {emojis[1]} - __{employee2}__ \n\n   {emojis[2]} - __{employee3}__', color=default_color)
 	if channel == False:
 		channel = ctx.channel
@@ -53,17 +51,18 @@ async def on_raw_reaction_add(payload):
 			if message.author.id != payload.user_id:
 				if ' MVP Vote for ' in message.embeds[0].title:
 					year, month = message.embeds[0].title.strip('!').split(" MVP Vote for ")
-					file_path = f'{parent_dir}/resources/votes/{year}/{month}.json'
+					guildid = message.guild.id
+					file_path = f'{parent_dir}/resources/votes/{guildid}/{year}/{month}.json'
 					with open(file_path, "r+") as file:
 						employees = list(json.load(file).keys())
 					if emoji.name == '👍🏼':
-						addVote(payload.user_id, employees[0], month, year)
+						addVote(payload.user_id, guildid, employees[0], month, year)
 						await message.remove_reaction('👍🏼', user)
 					elif emoji.name == '❤️':
-						addVote(payload.user_id, employees[1], month, year)
+						addVote(payload.user_id, guildid, employees[1], month, year)
 						await message.remove_reaction('❤️', user)
 					elif emoji.name == '☺️':
-						addVote(payload.user_id, employees[2], month, year)
+						addVote(payload.user_id, guildid, employees[2], month, year)
 						await message.remove_reaction('☺️', user)
 					with open(file_path, "r+") as file:
 						votes = json.load(file)
@@ -74,5 +73,3 @@ async def on_raw_reaction_add(payload):
 							votes[vote] = f' {len(votes[vote])}'
 					embed = discord.Embed(title=f'{year} MVP Vote for {month}!', description=f'Please react with who you think earned the top MVP spot! \n\n	{emojis[0]}{votes[employees[0]]} - __{employees[0]}__ \n\n   {emojis[1]}{votes[employees[1]]} - __{employees[1]}__ \n\n   {emojis[2]}{votes[employees[2]]} - __{employees[2]}__', color=default_color)
 					await message.edit(embed=embed)
-
-bot.run('')
