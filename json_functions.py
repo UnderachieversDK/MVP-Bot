@@ -1,7 +1,7 @@
 import json
 import os
 
-parent_dir = "C:/Users/Daniel/Desktop/Python/MVP Bot"
+parent_dir = ""
 
 def addVote(userid, guildid, employee, month, year):
 	file_path = f'{parent_dir}/resources/votes/{guildid}/{year}/{month}.json'
